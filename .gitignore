@@ -1,0 +1,14 @@
+
+#log
+*.log
+log.txt
+
+node_modules
+
+
+dist
+app.asar
+
+scripts
+
+.idea

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>log parser</title>
+    <link rel="stylesheet" href="assets/lib/bootstrap/css/bootstrap-black.css">
+    <link rel="stylesheet" href="assets/style.css">
+    
+    <style type="text/css">
+    #holder {
+        display: flex;
+        flex: 1;
+        align-items: center;
+        justify-content: center;
+        font-size: 30px;
+        font-weight: 400;
+        -webkit-user-select: none;
+        height: 300px;
+    }
+
+    html, body {
+        height: 100%;
+        margin-left: 5px;
+        margin-right: 5px;
+    }
+
+    body {
+        padding-top: 60px;
+    }
+
+    .main-view {
+        overflow-y: auto;
+    }
+    .main-view td {
+        vertical-align: middle;
+    }
+    .main-view .row {
+        height: 100%;
+        overflow-y: auto; 
+    }
+
+    .footer {
+        position: fixed;
+        bottom: 0;
+        margin-top: 5px;
+        border-top: 1px solid;
+        background: inherit;
+    }
+
+    /* patch bootstrap */
+    .progress-bar {
+        -webkit-transition: none; 
+        -o-transition: none;
+        transition: none; 
+    }
+
+    .form-horizontal .form-group {
+        margin-left: 0;
+        margin-right: 0;
+        margin-bottom: 5px;
+    }
+    
+    .win-command {
+        margin-right: -15px;
+    }
+    
+    .win-command .command {
+        color: white;
+        padding: 10px;
+    }
+    
+    .drag-aera {
+        -webkit-app-region: drag;
+        -webkit-user-select: none;
+    }
+
+    ::-webkit-scrollbar-button {
+        background: #555;
+    }
+    ::-webkit-scrollbar-thumb {
+        background: #555;
+    }
+
+    ::-webkit-scrollbar {
+        background: #444;
+    }
+
+    #parse-list .dropdown-menu li a {
+        padding: 0;
+    }
+    #parse-list .dropdown-menu li a label{
+        padding: 5px 10px;
+        display: block;
+    }
+    </style>
+
+</head>
+
+<body>
+    <nav class="navbar navbar-inverse navbar-fixed-top drag-aera" role="navigation">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" 
+                data-target="#bs-example-navbar-collapse-1" style="-webkit-app-region: no-drag">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a style="margin-right: 15px;float: left; margin-top: 2px;">
+                    <img src="./assets/images/logo.png" height="50" />
+                </a>
+                <!-- <a class="navbar-brand" href="#">
+                    <i>LoPa</i>
+                </a> -->
+            </div>
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav" style="-webkit-app-region: no-drag">
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i>LoPa</i><span class="caret"></span></a>
+                        <ul class="dropdown-menu inverse" role="menu">
+                            <li><a data-cmd="open.file" href="#">Open File to Parse</a></li>
+                            <li class="divider"></li>
+                            <li><a data-cmd="reload.win" href="#">Reload</a></li>
+                            <li><a data-cmd="toggledevtools" href="#">Developer Tools</a></li>
+                            <li><a data-cmd="close.win" href="#">Exit</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown" id="parse-list">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            <span id="parser-name">FocMsgParser</span><span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu inverse" role="menu">
+                            <li><a><label><input name="parser" data-name="FocMsgParser" type="radio" checked> Foc Message </a></label></li>
+                            <li><a><label><input name="parser" data-name="FocReqCounter" type="radio"> Foc Req Log Counter </a></label></li>
+                            <li><a><label><input name="parser" data-name="IISLogParser" type="radio"> IIS Req Log </label></a></li>
+                            <li><a><label><input name="parser" data-name="KongLogParser" type="radio"> Kong Log </label></a></li>
+                            <li><a><label><input name="parser" data-name="NginxLogParser" type="radio"> Nginx Log </label></a></li>
+                            <li><a><label><input name="parser" data-name="FlightParser" type="radio"> Flight Distrib </label></a></li>
+                            <li role="separator" class="divider"></li>
+                            <li><a><label><input name="distrib-only" type="checkbox"> Only for Distrib Analysis </label></a></li>
+                            
+                            <!-- <li><a><label><input name="parser" data-name="log4" type="radio"> log4J/NET/JS </label></a></li> -->
+                        </ul>                       
+                    </li>
+                </ul>
+                <ul class="nav navbar-right win-command" style="-webkit-app-region: no-drag">
+                    <li><a class="command inverse bg-red-hover" data-cmd="close.win" href="#">
+                        <i class="glyphicon glyphicon-remove"></i>
+                    </a></li>
+                </ul>
+                <ul class="nav navbar-right win-command" style="-webkit-app-region: no-drag">
+                    <li><a class="command inverse bg-red-hover" data-cmd="max.win" href="#">
+                        <i class="glyphicon glyphicon-plus"></i>
+                    </a></li>
+                </ul>
+                <ul class="nav navbar-right win-command" style="-webkit-app-region: no-drag">
+                    <li><a class="command inverse  bg-mflight-hover" data-cmd="min.win" href="#">
+                        <i class="glyphicon glyphicon-minus"></i>
+                    </a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="container-fluid main-view" id="root">
+    </div>
+
+    <div class="container-fluid footer">
+        powered by electron, created by Yu.T 
+        <div id="sys_info">
+            Working Set: <span data-memtype="workingSetSize">0</span> MB |
+            Private: <span data-memtype="privateBytes">0</span> MB |
+            Shared: <span data-memtype="sharedBytes">0</span> MB
+        </div>
+    </div>
+    
+    <script>
+    global.jQuery = require('./assets/lib/jquery.js');
+    require('./assets/lib/bootstrap/js/bootstrap.js');
+
+    require('./assets/lib/patch.js');
+
+    require('./assets/scripts/ui.js');
+    require('./assets/scripts/app.js');
+    </script>
+</body>
+
+</html>
