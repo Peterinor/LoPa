@@ -20,6 +20,7 @@ function parseLine(l) {
             var mo = JSON.parse(msgStr);
             var msg = {};
             msg.time = time;
+            msg.name = mo.name;
             msg.data = mo.args;
             return msg;
 
