@@ -48,7 +48,7 @@ function parse(file, parsed, process) {
                     .map(f => {
                         return String(f).replace(/-\D/g, function(match) {
                             return match.charAt(1).toUpperCase();
-                        });
+                        }).replace('(', '').replace(')', '');
                     })
             }
             return;

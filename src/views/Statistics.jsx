@@ -22,6 +22,7 @@ class Statistics extends React.Component {
         this.groupKey = null;
         this.groupRegex = null;
         this.excludeRegex = null;
+        this.moreThan = 5;
 
         this.id = "stat_chart_container_" + (new Date()).getTime();
     }
@@ -60,6 +61,17 @@ class Statistics extends React.Component {
                             }}
                         />
                     </div>
+                    <div className="form-group">
+                        <input
+                            className="form-control input-sm mono-font"
+                            type="number"
+                            placeholder="count more than... (default 5)"
+                            onChange={(e) => this.moreThan = e.target.value}
+                            onKeyPress={(e) => {
+                                if (e.charCode === 13) this._stat();
+                            }}
+                        />
+                    </div>
                 </div>
                 <div id={this.id} style={{minWidth: '700px', width: '100%', margin: '0 auto', height: '500px'}}></div>
             </div>
@@ -81,7 +93,7 @@ class Statistics extends React.Component {
         var xs = [];
         if (this.groupKey) {
             this.logs.forEach((item) => {
-                var originX = item.data[0][this.groupKey];
+                var originX = item.data[this.groupKey];
                 var x = groupTrans(originX);
                 var ex = testExclude(originX);
                 if (x && !ex) {
@@ -96,7 +108,8 @@ class Statistics extends React.Component {
                 }
             });
             xs.sort((x1, x2) => - (buckets[x1].length - buckets[x2].length));
-            var data = xs.map((x) => [x, buckets[x].length]);
+            var data = xs.map((x) => [x, buckets[x].length]).filter(q => q[1] >= this.moreThan);
+            console.log(data.map(d => d[0]).join(','));
             this._renderChart(data);
         }
     }
