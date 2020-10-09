@@ -9,6 +9,7 @@ const {
 } = require('./RuleBuildForm');
 
 var DistributionForm = require('./DistributionForm');
+var Statistics = require('./Statistics');
 
 class SearchLog extends React.Component {
     constructor(props) {
@@ -83,16 +84,22 @@ class SearchLog extends React.Component {
                 <div>
                     <ul className="nav nav-tabs" role="tablist">
                         <li className="active"><a href="#logofsearch" data-toggle="tab">Detail</a></li>
-                        {this.state.filteredLogs.length > 20 &&
+                        {this.state.filteredLogs.length > 10 &&
                         <li><a href="#chartofsearch" data-toggle="tab">Chart</a></li>}
+                        {this.state.filteredLogs.length > 10 &&
+                        <li><a href="#statistics4search" role="tab" data-toggle="tab">统计分析</a></li>}
                     </ul>
                     <div className="tab-content">
                         <div role="tabpanel" className="tab-pane active" id="logofsearch">
                             <LogList logs={this.state.filteredLogs} app={this.app} logKey={this.logKey} />
                         </div>
-                        {this.state.filteredLogs.length > 20 &&
+                        {this.state.filteredLogs.length > 10 &&
                         <div role="tabpanel" className="tab-pane" id="chartofsearch">
                             <DistributionForm logs={this.state.filteredLogs} logKey={this.logKey} />
+                        </div>}
+                        {this.state.filteredLogs.length > 10 &&
+                            <div role="tabpanel" className="tab-pane" id="statistics4search">
+                            <Statistics logs={this.state.filteredLogs} app={this.app} logKey={this.logKey} />
                         </div>}
                     </div>
                 </div>
